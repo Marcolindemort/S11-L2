@@ -1,30 +1,27 @@
 export const ADD_TO_FAVOURITE = "ADD_TO_FAVOURITE";
 export const REMOVE_FROM_FAVOURITE = "REMOVE_FROM_FAVOURITE";
+export const SET_QUERY = "SET_QUERY";
 
 export const addFavourite = (fav) => ({ type: ADD_TO_FAVOURITE, payload: fav });
 export const removeFavourite = () => ({ type: REMOVE_FROM_FAVOURITE });
 
-export const SET_QUERY = "SET_QUERY";
-export const CLEAR_QUERY = "CLEAR_QUERY";
+const baseEndpoint = "https://strive-benchmark.herokuapp.com/api/jobs?search=";
 
-export const setQuery = (search) => ({ type: SET_QUERY, payload: search });
-export const clearQuery = () => ({ type: CLEAR_QUERY });
-
-export const FETCH_DATA_REQUEST = 'FETCH_DATA_REQUEST';
-export const FETCH_DATA_SUCCESS = 'FETCH_DATA_SUCCESS';
-export const FETCH_DATA_FAILURE = 'FETCH_DATA_FAILURE';
-
-export const fetchDataRequest = () => ({ type: FETCH_DATA_REQUEST });
-export const fetchDataSuccess = (data) => ({ type: FETCH_DATA_SUCCESS, payload: data });
-export const fetchDataFailure = (error) => ({ type: FETCH_DATA_FAILURE, payload: error });
-
-export const fetchData = (data) => {
-    return async (dispatch, event) => {
-        event.preventDefault();
-        dispatch(fetchDataRequest());
-        try {
-            const response = await fetch("https://strive-benchmark.herokuapp.com/api/jobs?search=" + data + "&limit=20" )
-        }
-    }   
-}
-
+export const fetchData = (query) => {
+	return async (dispatch) => {
+		try {
+			const response = await fetch(baseEndpoint + query + "&limit=20");
+			if (response.ok) {
+				const { data } = await response.json();
+				dispatch({
+					type: SET_QUERY,
+					payload: data,
+				});
+			} else {
+				alert("Error fetching results");
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+};
